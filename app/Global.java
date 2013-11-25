@@ -1,6 +1,7 @@
 import models.UserInfoDB;
 import play.Application;
 import play.GlobalSettings;
+import play.Play;
 
 /**
  * Provide initialization code for the digits application.
@@ -13,6 +14,9 @@ public class Global extends GlobalSettings {
    * @param app The application.
    */
   public void onStart(Application app) {
-    UserInfoDB.addUserInfo("John Smith", "smith@example.com", "password");
+    String adminEmail = Play.application().configuration().getString("login.admin.email");
+    String adminPassword = Play.application().configuration().getString("login.admin.password");
+    
+    UserInfoDB.defineAdmin("Administrator", adminEmail, adminPassword);
   }
 }

@@ -1,8 +1,5 @@
 package models;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Provides an in-memory repository for UserInfo.
  * Storing credentials in the clear is kind of bogus.
@@ -10,7 +7,28 @@ import java.util.Map;
  */
 public class UserInfoDB {
   
-  private static Map<String, UserInfo> userinfos = new HashMap<String, UserInfo>();
+  /**
+   * Defines the admin account.
+   * @param name Admin name.
+   * @param email Admin email.
+   * @param password Admin password. 
+   */
+  public static void defineAdmin(String name, String email, String password) {
+    if ((email != null) && (password != null) && (!adminDefined())) {
+      UserInfo userInfo = new UserInfo(name, email, password);
+      userInfo.setAdmin(true);
+      userInfo.save();
+    }
+  }
+  
+  /**
+   * Returns true if admin is defined.
+   * @return True if admin defined.
+   */
+  public static boolean adminDefined() {
+    UserInfo userInfo = UserInfo.find().where().eq("admin", true).findUnique();
+    return userInfo != null;
+  }
   
   /**
    * Adds the specified user to the UserInfoDB.
@@ -19,7 +37,8 @@ public class UserInfoDB {
    * @param password Their password. 
    */
   public static void addUserInfo(String name, String email, String password) {
-    userinfos.put(email, new UserInfo(name, email, password));
+    UserInfo userInfo = new UserInfo(name, email, password);
+    userInfo.save();
   }
   
   /**
@@ -28,7 +47,7 @@ public class UserInfoDB {
    * @return True if known user.
    */
   public static boolean isUser(String email) {
-    return userinfos.containsKey(email);
+    return (UserInfo.find().where().eq("email", email).findUnique() != null);
   }
 
   /**
@@ -37,7 +56,7 @@ public class UserInfoDB {
    * @return The UserInfo.
    */
   public static UserInfo getUser(String email) {
-    return userinfos.get((email == null) ? "" : email);
+    return UserInfo.find().where().eq("email", email).findUnique();
   }
 
   /**
